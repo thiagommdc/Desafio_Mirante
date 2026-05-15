@@ -24,6 +24,9 @@ public static class InjecaoDependenciaInfraestrutura
 
         services.AddScoped(typeof(IRepositorioGenerico<>), typeof(Repositorio<>));
         services.AddScoped<IRepositorioProduto, RepositorioProduto>();
+        services.AddScoped<IRepositorioTarefa, RepositorioTarefa>();
+        services.AddScoped<IRepositorioComentarioTarefa, RepositorioComentarioTarefa>();
+        services.AddScoped<IRepositorioUsuario, RepositorioUsuario>();
         services.AddScoped<IUnidadeTrabalho, UnidadeTrabalho>();
         services.AddScoped<IServicoUsuarioAtual, ServicoUsuarioAtual>();
         services.AddScoped<IInicializadorBancoDados, InicializadorBancoDados>();

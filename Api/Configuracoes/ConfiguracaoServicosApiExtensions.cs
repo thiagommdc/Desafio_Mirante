@@ -2,6 +2,7 @@ using DesafioMirante.Api.Contratos;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using System.Text.Json.Serialization;
 
 namespace DesafioMirante.Api.Configuracoes;
 
@@ -14,6 +15,10 @@ public static class ConfiguracaoServicosApiExtensions
         {
             opcoes.RespectBrowserAcceptHeader = true;
             opcoes.ReturnHttpNotAcceptable = true;
+        })
+        .AddJsonOptions(opcoes =>
+        {
+            opcoes.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
