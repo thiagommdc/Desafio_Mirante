@@ -1,4 +1,5 @@
-using DesafioMirante.Application.Abstractions.Persistence;
+using DesafioMirante.Application.Interfaces.Persistence;
+using DesafioMirante.Infrastructure.Persistence.Context;
 
 namespace DesafioMirante.Infrastructure.Persistence.Repositories;
 

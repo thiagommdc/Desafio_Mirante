@@ -1,5 +1,6 @@
-using DesafioMirante.Application.Abstractions.Persistence;
+using DesafioMirante.Application.Interfaces.Persistence;
 using DesafioMirante.Domain.Common;
+using DesafioMirante.Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 
 namespace DesafioMirante.Infrastructure.Persistence.Repositories;

@@ -1,67 +1,20 @@
 # Desafio Mirante
 
-API ASP.NET Core 8 organizada em camadas, com foco em clareza, execução local simples e estrutura pronta para crescer sem overengineering.
+API ASP.NET Core 8 organizada com Clean Architecture, foco em legibilidade, separacao de responsabilidades e facilidade de evolucao.
 
 ## Stack
 
 - ASP.NET Core Web API
 - Entity Framework Core
 - SQLite
+- PostgreSQL ready
 - Swagger
 - FluentValidation
 - AutoMapper
 
-## Estrutura
-
-```text
-DesafioMirante.sln
-|-- Api
-|   |-- Controllers
-|   |-- Middleware
-|   |-- Properties
-|-- Application
-|   |-- Abstractions
-|   |-- Common
-|   |-- DTOs
-|   |-- Mappings
-|   |-- Services
-|   |-- Validators
-|-- Domain
-|   |-- Common
-|   |-- Entities
-|-- Infrastructure
-|   |-- Migrations
-|   |-- Persistence
-|   |-- Services
-|-- dotnet-tools.json
-```
-
 ## Arquitetura
 
-- `Api`: ponto de entrada HTTP, controllers, middleware global, Swagger e composição de dependências.
-- `Application`: regras de aplicação, DTOs, validações, mapeamentos e service layer.
-- `Domain`: entidades e contratos de negócio mais estáveis.
-- `Infrastructure`: EF Core, repositórios, seed, auditoria e implementação dos serviços técnicos.
-
-## Funcionalidades base já prontas
-
-- Repository Pattern
-- Service Layer
-- DTOs
-- Middleware global de exceções
-- Logging com providers nativos
-- Paginação
-- Filtros
-- Soft delete
-- Auditoria
-- Migration inicial
-- Seed inicial
-- Async/await
-- CancellationToken
-
-## Entidade de exemplo
-
-Foi criada a entidade `Product` para demonstrar a base da prova sem acoplar a estrutura a uma regra de negócio específica.
+A estrutura completa e a responsabilidade de cada camada estao em [docs/ARQUITETURA.md](docs/ARQUITETURA.md).
 
 ## Comandos
 
@@ -71,9 +24,7 @@ dotnet build DesafioMirante.sln
 dotnet run --project Api/DesafioMirante.Api.csproj
 ```
 
-### EF Core
-
-O repositório já inclui `dotnet-tools.json` com `dotnet-ef` 8.0.5.
+## EF Core
 
 ```bash
 dotnet tool restore
@@ -81,16 +32,11 @@ dotnet tool run dotnet-ef database update --project Infrastructure/DesafioMirant
 dotnet tool run dotnet-ef migrations add NomeDaMigration --project Infrastructure/DesafioMirante.Infrastructure.csproj --startup-project Api/DesafioMirante.Api.csproj
 ```
 
-## Observação importante do ambiente
+## Configuracao de provider
 
-Para executar a API e os comandos do EF Core nesta máquina, é necessário ter o runtime ASP.NET Core 8 x64 instalado. A solution já compila em `net8.0`, mas a execução local falha sem esse runtime específico.
+O provider de banco fica isolado na infraestrutura e pode ser alterado por configuracao:
 
-## Migração futura para PostgreSQL
+- `Persistencia:Provedor = Sqlite`
+- `Persistencia:Provedor = PostgreSql`
 
-A aplicação já está preparada em termos de separação de camadas. Na prática, a migração fica concentrada em:
-
-- trocar o provider no `Infrastructure/DependencyInjection.cs`
-- ajustar a connection string
-- recriar as migrations com o provider PostgreSQL
-
-O restante da aplicação pode permanecer praticamente igual.
+As regras de negocio em `Application` e `Domain` nao dependem diretamente de SQLite.

@@ -1,4 +1,4 @@
-using DesafioMirante.Application.Abstractions.Services;
+using DesafioMirante.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Http;
 
 namespace DesafioMirante.Infrastructure.Services;

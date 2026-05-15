@@ -1,25 +1,21 @@
-using DesafioMirante.Api.Middleware;
-using DesafioMirante.Application;
-using DesafioMirante.Infrastructure;
+using DesafioMirante.Api.Configuracoes;
+using DesafioMirante.Api.Middlewares;
+using DesafioMirante.Application.DependencyInjection;
+using DesafioMirante.Infrastructure.DependencyInjection;
 using DesafioMirante.Infrastructure.Services;
-using FluentValidation.AspNetCore;
 
 var construtor = WebApplication.CreateBuilder(args);
 
-construtor.Logging.ClearProviders();
-construtor.Logging.AddConsole();
-construtor.Logging.AddDebug();
-
-construtor.Services.AddHttpContextAccessor();
-construtor.Services.AddControllers();
-construtor.Services.AddEndpointsApiExplorer();
-construtor.Services.AddSwaggerGen();
-construtor.Services.AddFluentValidationAutoValidation();
+construtor.AdicionarConfiguracaoLogging();
+construtor.Services.AdicionarServicosApi();
 construtor.Services.AdicionarAplicacao();
 construtor.Services.AdicionarInfraestrutura(construtor.Configuration);
 
 var aplicacao = construtor.Build();
 
+aplicacao.UseMiddleware<MiddlewareCorrelacaoRequisicao>();
+aplicacao.UseMiddleware<MiddlewareCabecalhosSeguranca>();
+aplicacao.UseMiddleware<MiddlewareLoggingRequisicao>();
 aplicacao.UseMiddleware<MiddlewareTratamentoExcecoes>();
 
 if (aplicacao.Environment.IsDevelopment())
@@ -27,8 +23,13 @@ if (aplicacao.Environment.IsDevelopment())
     aplicacao.UseSwagger();
     aplicacao.UseSwaggerUI();
 }
+else
+{
+    aplicacao.UseHsts();
+}
 
 aplicacao.UseHttpsRedirection();
+aplicacao.MapHealthChecks("/health");
 aplicacao.MapControllers();
 
 using (var escopo = aplicacao.Services.CreateScope())

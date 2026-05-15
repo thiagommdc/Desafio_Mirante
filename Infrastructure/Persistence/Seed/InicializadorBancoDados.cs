@@ -1,4 +1,5 @@
 using DesafioMirante.Domain.Entities;
+using DesafioMirante.Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 

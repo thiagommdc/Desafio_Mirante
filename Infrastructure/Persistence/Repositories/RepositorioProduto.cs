@@ -1,7 +1,9 @@
-using DesafioMirante.Application.Abstractions.Persistence;
 using DesafioMirante.Application.Common.Models;
-using DesafioMirante.Application.DTOs.Products;
+using DesafioMirante.Application.Features.Produtos.DTOs;
+using DesafioMirante.Application.Interfaces.Persistence;
 using DesafioMirante.Domain.Entities;
+using DesafioMirante.Infrastructure.Persistence.Context;
+using DesafioMirante.Infrastructure.Persistence.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace DesafioMirante.Infrastructure.Persistence.Repositories;
@@ -17,45 +19,21 @@ public sealed class RepositorioProduto : Repositorio<Produto>, IRepositorioProdu
         RequisicaoFiltroProduto filtro,
         CancellationToken cancellationToken)
     {
-        var consulta = Contexto.Produtos.AsNoTracking().AsQueryable();
+        var nome = filtro.Nome?.Trim();
 
-        if (!string.IsNullOrWhiteSpace(filtro.TermoBusca))
-        {
-            var termoBusca = filtro.TermoBusca.Trim();
-
-            consulta = consulta.Where(produto =>
-                EF.Functions.Like(produto.Nome, $"%{termoBusca}%")
-                || EF.Functions.Like(produto.Sku, $"%{termoBusca}%"));
-        }
-
-        if (filtro.PrecoMinimo.HasValue)
-        {
-            consulta = consulta.Where(produto => produto.Preco >= filtro.PrecoMinimo.Value);
-        }
-
-        if (filtro.PrecoMaximo.HasValue)
-        {
-            consulta = consulta.Where(produto => produto.Preco <= filtro.PrecoMaximo.Value);
-        }
-
-        if (filtro.Ativo.HasValue)
-        {
-            consulta = consulta.Where(produto => produto.Ativo == filtro.Ativo.Value);
-        }
-
-        var totalRegistros = await consulta.CountAsync(cancellationToken);
-
-        var itens = await consulta
+        var consulta = Contexto.Produtos
+            .AsNoTracking()
+            .TagWith("Produtos:ObterPaginado")
+            .AplicarFiltroQuando(
+                !string.IsNullOrWhiteSpace(nome),
+                origem => origem.Where(produto => EF.Functions.Like(produto.Nome, $"%{nome}%")))
+            .AplicarFiltroQuando(
+                filtro.Ativo.HasValue,
+                origem => origem.Where(produto => produto.Ativo == filtro.Ativo!.Value))
             .OrderBy(produto => produto.Nome)
-            .Skip((filtro.NumeroPagina - 1) * filtro.TamanhoPagina)
-            .Take(filtro.TamanhoPagina)
-            .ToListAsync(cancellationToken);
+            .ThenBy(produto => produto.Id);
 
-        return new ResultadoPaginado<Produto>(
-            itens,
-            filtro.NumeroPagina,
-            filtro.TamanhoPagina,
-            totalRegistros);
+        return await consulta.ParaResultadoPaginadoAsync(filtro, cancellationToken);
     }
 
     public async Task<bool> ExistePorSkuAsync(
