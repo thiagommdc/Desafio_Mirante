@@ -1,0 +1,18 @@
+@host = https://localhost:7291
+
+GET {{host}}/api/produtos?numeroPagina=1&tamanhoPagina=10
+Accept: application/json
+
+###
+
+POST {{host}}/api/produtos
+Content-Type: application/json
+
+{
+  "nome": "Teclado Mecanico",
+  "sku": "KEY-MEC-001",
+  "descricao": "Teclado com switches tateis.",
+  "preco": 399.90,
+  "quantidadeEstoque": 18,
+  "ativo": true
+}
