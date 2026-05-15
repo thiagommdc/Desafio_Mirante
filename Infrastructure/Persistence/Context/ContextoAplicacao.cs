@@ -17,7 +17,6 @@ public sealed class ContextoAplicacao : DbContext
         _servicoUsuarioAtual = servicoUsuarioAtual;
     }
 
-    public DbSet<Produto> Produtos => Set<Produto>();
     public DbSet<User> Users => Set<User>();
     public DbSet<TaskItem> TaskItems => Set<TaskItem>();
     public DbSet<TaskComment> TaskComments => Set<TaskComment>();

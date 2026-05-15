@@ -23,7 +23,6 @@ public static class InjecaoDependenciaInfraestrutura
             ConfiguradorProvedorBancoDados.Configurar(opcoes, configuration, configuracaoBancoDados));
 
         services.AddScoped(typeof(IRepositorioGenerico<>), typeof(Repositorio<>));
-        services.AddScoped<IRepositorioProduto, RepositorioProduto>();
         services.AddScoped<IRepositorioTarefa, RepositorioTarefa>();
         services.AddScoped<IRepositorioComentarioTarefa, RepositorioComentarioTarefa>();
         services.AddScoped<IRepositorioUsuario, RepositorioUsuario>();

@@ -20,67 +20,6 @@ namespace DesafioMirante.Infrastructure.Persistence.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.5");
 
-            modelBuilder.Entity("DesafioMirante.Domain.Entities.Produto", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("Ativo")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime?>("AtualizadoEmUtc")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("AtualizadoPor")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("CriadoEmUtc")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("CriadoPor")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Descricao")
-                        .HasMaxLength(500)
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("Excluido")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime?>("ExcluidoEmUtc")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ExcluidoPor")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Nome")
-                        .IsRequired()
-                        .HasMaxLength(120)
-                        .HasColumnType("TEXT");
-
-                    b.Property<decimal>("Preco")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("QuantidadeEstoque")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Sku")
-                        .IsRequired()
-                        .HasMaxLength(40)
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Nome");
-
-                    b.HasIndex("Sku");
-
-                    b.ToTable("Produtos", (string)null);
-                });
-
             modelBuilder.Entity("DesafioMirante.Domain.Entities.TaskComment", b =>
                 {
                     b.Property<Guid>("Id")
