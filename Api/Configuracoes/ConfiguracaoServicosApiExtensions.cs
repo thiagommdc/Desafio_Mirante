@@ -11,11 +11,7 @@ public static class ConfiguracaoServicosApiExtensions
     public static IServiceCollection AdicionarServicosApi(this IServiceCollection services)
     {
         services.AddHttpContextAccessor();
-        services.AddControllers(opcoes =>
-        {
-            opcoes.RespectBrowserAcceptHeader = true;
-            opcoes.ReturnHttpNotAcceptable = true;
-        })
+        services.AddControllers()
         .AddJsonOptions(opcoes =>
         {
             opcoes.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
