@@ -28,11 +28,17 @@ public static class ConfiguracaoServicosApiExtensions
         {
             opcoes.InvalidModelStateResponseFactory = context =>
             {
-                var erros = context.ModelState
-                    .Where(item => item.Value?.Errors.Count > 0)
-                    .ToDictionary(
-                        item => item.Key,
-                        item => item.Value!.Errors.Select(erro => erro.ErrorMessage).ToArray());
+                var erros = RespostaErroApiFactory.CriarErrosValidacao(context.ModelState);
+                var logger = context.HttpContext.RequestServices
+                    .GetRequiredService<ILogger<Program>>();
+
+                logger.LogWarning(
+                    "Requisicao HTTP invalida. Metodo: {Metodo}, Caminho: {Caminho}, StatusCode: {StatusCode}, TraceId: {TraceId}, CamposInvalidos: {CamposInvalidos}",
+                    context.HttpContext.Request.Method,
+                    context.HttpContext.Request.Path,
+                    StatusCodes.Status400BadRequest,
+                    context.HttpContext.TraceIdentifier,
+                    erros.Keys);
 
                 var resposta = RespostaErroApi.Criar(
                     "A requisicao possui campos invalidos.",

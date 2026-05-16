@@ -24,13 +24,14 @@ public sealed class MiddlewareTratamentoExcecoes
         }
         catch (ValidationException exception)
         {
-            _logger.LogWarning(exception, "Erro de validacao ao processar a requisicao {Path}", context.Request.Path);
-
-            var erros = exception.Errors
-                .GroupBy(erro => erro.PropertyName)
-                .ToDictionary(
-                    grupo => grupo.Key,
-                    grupo => grupo.Select(erro => erro.ErrorMessage).ToArray());
+            var erros = RespostaErroApiFactory.CriarErrosValidacao(exception.Errors);
+            RegistrarErro(
+                context,
+                exception,
+                LogLevel.Warning,
+                StatusCodes.Status400BadRequest,
+                "Erro de validacao ao processar a requisicao.",
+                erros.Keys);
 
             await EscreverRespostaErroAsync(
                 context,
@@ -38,9 +39,30 @@ public sealed class MiddlewareTratamentoExcecoes
                 "Um ou mais erros de validacao ocorreram.",
                 erros);
         }
+        catch (BadHttpRequestException exception)
+        {
+            RegistrarErro(
+                context,
+                exception,
+                LogLevel.Warning,
+                StatusCodes.Status400BadRequest,
+                "Requisicao HTTP malformada.",
+                []);
+
+            await EscreverRespostaErroAsync(
+                context,
+                StatusCodes.Status400BadRequest,
+                "A requisicao HTTP e invalida.");
+        }
         catch (KeyNotFoundException exception)
         {
-            _logger.LogWarning(exception, "Recurso nao encontrado para a requisicao {Path}", context.Request.Path);
+            RegistrarErro(
+                context,
+                exception,
+                LogLevel.Warning,
+                StatusCodes.Status404NotFound,
+                "Recurso nao encontrado para a requisicao.",
+                []);
 
             await EscreverRespostaErroAsync(
                 context,
@@ -49,7 +71,13 @@ public sealed class MiddlewareTratamentoExcecoes
         }
         catch (InvalidOperationException exception)
         {
-            _logger.LogWarning(exception, "Violacao de regra de negocio para a requisicao {Path}", context.Request.Path);
+            RegistrarErro(
+                context,
+                exception,
+                LogLevel.Warning,
+                StatusCodes.Status409Conflict,
+                "Violacao de regra de negocio para a requisicao.",
+                []);
 
             await EscreverRespostaErroAsync(
                 context,
@@ -58,13 +86,39 @@ public sealed class MiddlewareTratamentoExcecoes
         }
         catch (Exception exception)
         {
-            _logger.LogError(exception, "Erro nao tratado ao processar a requisicao {Path}", context.Request.Path);
+            RegistrarErro(
+                context,
+                exception,
+                LogLevel.Error,
+                StatusCodes.Status500InternalServerError,
+                "Erro nao tratado ao processar a requisicao.",
+                []);
 
             await EscreverRespostaErroAsync(
                 context,
                 StatusCodes.Status500InternalServerError,
                 "Ocorreu um erro inesperado.");
         }
+    }
+
+    private void RegistrarErro(
+        HttpContext context,
+        Exception exception,
+        LogLevel nivelLog,
+        int statusCode,
+        string mensagem,
+        IEnumerable<string> camposInvalidos)
+    {
+        _logger.Log(
+            nivelLog,
+            exception,
+            "{Mensagem} Metodo: {Metodo}, Caminho: {Caminho}, StatusCode: {StatusCode}, TraceId: {TraceId}, CamposInvalidos: {CamposInvalidos}",
+            mensagem,
+            context.Request.Method,
+            context.Request.Path,
+            statusCode,
+            context.TraceIdentifier,
+            camposInvalidos);
     }
 
     private static async Task EscreverRespostaErroAsync(
