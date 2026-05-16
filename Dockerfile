@@ -1,5 +1,5 @@
 # Stage 1: Build
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 # Copy project files first for layer caching
@@ -16,13 +16,13 @@ COPY . .
 RUN dotnet publish Api/DesafioMirante.Api.csproj -c Release -o /app/publish --no-restore
 
 # Stage 2: Runtime
-FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 
-# Create data directory for SQLite volume and assign to built-in app user
-RUN mkdir -p /data && chown app:app /data
-
-USER app
+# Create data directory for SQLite volume and set permissive permissions
+# The base image may not provide a user named 'app', so set directory
+# permissions instead of changing ownership to avoid build failures.
+RUN mkdir -p /data && chmod 0777 /data
 
 COPY --from=build /app/publish .
 
